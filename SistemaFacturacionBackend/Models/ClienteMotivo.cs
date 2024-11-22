@@ -1,5 +1,4 @@
-﻿
-namespace SistemaFacturacionBackend.Models
+﻿namespace SistemaFacturacionBackend.Models
 {
     public class ClienteMotivo
     {
@@ -11,8 +10,4 @@ namespace SistemaFacturacionBackend.Models
         public string Ruc { get; set; }
         public string Empresa { get; set; }
     }
-
-
-
-
 }

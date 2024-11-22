@@ -3,7 +3,7 @@
     public class Cliente
     {
         public string Ruc { get; set; }
-        public string NombreCliente { get; set; } // Asegúrate de que este sea el nombre correcto
+        public string ClienteNombre { get; set; } 
         public string Direccion { get; set; }
         public string Telefono { get; set; }
         public string Email { get; set; }

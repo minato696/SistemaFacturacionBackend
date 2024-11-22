@@ -1,10 +1,8 @@
-﻿namespace SistemaFacturacionBackend.Data.Models
+﻿namespace SistemaFacturacionBackend.Models
 {
     public class Vendedor
     {
         public int Codigo { get; set; }
-        public string NombreVendedor { get; set; } 
+        public string Nombre { get; set; }
     }
-
-
 }

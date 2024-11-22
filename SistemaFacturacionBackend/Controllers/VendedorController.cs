@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data.Models;
-using SistemaFacturacionBackend.Data;
+using Microsoft.EntityFrameworkCore;
 using SistemaFacturacionBackend.Models;
-using System.Collections.Generic;
-using System.Linq;
+using SistemaFacturacionBackend.Data;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class VendedorController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -19,15 +17,15 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Vendedor>> GetVendedores()
+        public async Task<ActionResult<IEnumerable<Vendedor>>> GetVendedores()
         {
-            return _context.Vendedores.ToList();
+            return await _context.Vendedores.ToListAsync();
         }
 
         [HttpGet("{codigo}")]
-        public ActionResult<Vendedor> GetVendedor(int codigo)
+        public async Task<ActionResult<Vendedor>> GetVendedor(int codigo)
         {
-            var vendedor = _context.Vendedores.FirstOrDefault(v => v.Codigo == codigo);
+            var vendedor = await _context.Vendedores.FindAsync(codigo);
             if (vendedor == null)
             {
                 return NotFound();
@@ -36,45 +34,56 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Vendedor> PostVendedor(Vendedor vendedor)
+        public async Task<ActionResult<Vendedor>> PostVendedor(Vendedor vendedor)
         {
             _context.Vendedores.Add(vendedor);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetVendedor), new { codigo = vendedor.Codigo }, vendedor);
         }
 
         [HttpPut("{codigo}")]
-        public IActionResult PutVendedor(int codigo, Vendedor vendedor)
+        public async Task<IActionResult> PutVendedor(int codigo, Vendedor vendedor)
         {
             if (codigo != vendedor.Codigo)
             {
                 return BadRequest();
             }
 
-            var vendedorExistente = _context.Vendedores.FirstOrDefault(v => v.Codigo == codigo);
-            if (vendedorExistente == null)
+            _context.Entry(vendedor).State = EntityState.Modified;
+
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VendedorExists(codigo))
+                {
+                    return NotFound();
+                }
+                throw;
             }
 
-            vendedorExistente.NombreVendedor = vendedor.NombreVendedor;
-
-            _context.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{codigo}")]
-        public IActionResult DeleteVendedor(int codigo)
+        public async Task<IActionResult> DeleteVendedor(int codigo)
         {
-            var vendedor = _context.Vendedores.FirstOrDefault(v => v.Codigo == codigo);
+            var vendedor = await _context.Vendedores.FindAsync(codigo);
             if (vendedor == null)
             {
                 return NotFound();
             }
 
             _context.Vendedores.Remove(vendedor);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private bool VendedorExists(int codigo)
+        {
+            return _context.Vendedores.Any(e => e.Codigo == codigo);
         }
     }
 }

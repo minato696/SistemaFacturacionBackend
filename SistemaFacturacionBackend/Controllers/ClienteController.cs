@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SistemaFacturacionBackend.Models;
 using SistemaFacturacionBackend.Data;
-using SistemaFacturacionBackend.Models; // Asegúrate de importar este espacio de nombres
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SistemaFacturacionBackend.Controllers
 {
@@ -43,6 +41,32 @@ namespace SistemaFacturacionBackend.Controllers
             return CreatedAtAction(nameof(GetCliente), new { ruc = cliente.Ruc }, cliente);
         }
 
+        [HttpPut("{ruc}")]
+        public async Task<IActionResult> PutCliente(string ruc, Cliente cliente)
+        {
+            if (ruc != cliente.Ruc)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(cliente).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ClienteExists(ruc))
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+
+            return NoContent();
+        }
+
         [HttpDelete("{ruc}")]
         public async Task<IActionResult> DeleteCliente(string ruc)
         {
@@ -55,6 +79,11 @@ namespace SistemaFacturacionBackend.Controllers
             _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private bool ClienteExists(string ruc)
+        {
+            return _context.Clientes.Any(e => e.Ruc == ruc);
         }
     }
 }
