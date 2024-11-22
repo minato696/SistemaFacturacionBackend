@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Models;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace SistemaFacturacionBackend.Controllers
 {
@@ -19,15 +19,15 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<VendedorAnt>> GetVendedoresAnt()
+        public async Task<ActionResult<IEnumerable<VendedorAnt>>> GetVendedoresAnt()
         {
-            return _context.VendedoresAnt.ToList();
+            return await _context.VendedoresAnt.ToListAsync();
         }
 
         [HttpGet("{codigo}")]
-        public ActionResult<VendedorAnt> GetVendedorAnt(int codigo)
+        public async Task<ActionResult<VendedorAnt>> GetVendedorAnt(int codigo)
         {
-            var vendedorAnt = _context.VendedoresAnt.FirstOrDefault(v => v.Codigo == codigo);
+            var vendedorAnt = await _context.VendedoresAnt.FirstOrDefaultAsync(v => v.Codigo == codigo);
             if (vendedorAnt == null)
             {
                 return NotFound();
@@ -36,45 +36,44 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpPost]
-        public ActionResult<VendedorAnt> PostVendedorAnt(VendedorAnt vendedorAnt)
+        public async Task<ActionResult<VendedorAnt>> PostVendedorAnt(VendedorAnt vendedorAnt)
         {
             _context.VendedoresAnt.Add(vendedorAnt);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetVendedorAnt), new { codigo = vendedorAnt.Codigo }, vendedorAnt);
         }
 
         [HttpPut("{codigo}")]
-        public IActionResult PutVendedorAnt(int codigo, VendedorAnt vendedorAnt)
+        public async Task<IActionResult> PutVendedorAnt(int codigo, VendedorAnt vendedorAnt)
         {
             if (codigo != vendedorAnt.Codigo)
             {
                 return BadRequest();
             }
 
-            var vendedorAntExistente = _context.VendedoresAnt.FirstOrDefault(v => v.Codigo == codigo);
+            var vendedorAntExistente = await _context.VendedoresAnt.FirstOrDefaultAsync(v => v.Codigo == codigo);
             if (vendedorAntExistente == null)
             {
                 return NotFound();
             }
 
-            vendedorAntExistente.NombreVendedorAnt = vendedorAnt.NombreVendedorAnt; // Ajustado
+            vendedorAntExistente.Nombre = vendedorAnt.Nombre;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-
         [HttpDelete("{codigo}")]
-        public IActionResult DeleteVendedorAnt(int codigo)
+        public async Task<IActionResult> DeleteVendedorAnt(int codigo)
         {
-            var vendedorAnt = _context.VendedoresAnt.FirstOrDefault(v => v.Codigo == codigo);
+            var vendedorAnt = await _context.VendedoresAnt.FirstOrDefaultAsync(v => v.Codigo == codigo);
             if (vendedorAnt == null)
             {
                 return NotFound();
             }
 
             _context.VendedoresAnt.Remove(vendedorAnt);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return NoContent();
         }
     }
