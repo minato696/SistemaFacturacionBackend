@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Data.Models;
+using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class OrdenController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -17,51 +19,60 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetOrdenes()
+        public ActionResult<IEnumerable<Orden>> GetOrdenes()
         {
-            var ordenes = _context.Ordenes.ToList();
-            return Ok(ordenes);
+            return _context.Ordenes.ToList();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetOrdenById(int id)
+        [HttpGet("{reg}")]
+        public ActionResult<Orden> GetOrden(int reg)
         {
-            var orden = _context.Ordenes.Find(id);
-            if (orden == null) return NotFound();
-            return Ok(orden);
+            var orden = _context.Ordenes.FirstOrDefault(o => o.Reg == reg);
+            if (orden == null)
+            {
+                return NotFound();
+            }
+            return orden;
         }
 
         [HttpPost]
-        public IActionResult CreateOrden([FromBody] Orden orden)
+        public ActionResult<Orden> PostOrden(Orden orden)
         {
             _context.Ordenes.Add(orden);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetOrdenById), new { id = orden.Reg }, orden);
+            return CreatedAtAction(nameof(GetOrden), new { reg = orden.Reg }, orden);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateOrden(int id, [FromBody] Orden orden)
+        [HttpPut("{reg}")]
+        public IActionResult PutOrden(int reg, Orden orden)
         {
-            if (id != orden.Reg) return BadRequest();
+            if (reg != orden.Reg)
+            {
+                return BadRequest();
+            }
 
-            var existingOrden = _context.Ordenes.Find(id);
-            if (existingOrden == null) return NotFound();
+            var ordenExistente = _context.Ordenes.FirstOrDefault(o => o.Reg == reg);
+            if (ordenExistente == null)
+            {
+                return NotFound();
+            }
 
-            existingOrden.Fecha = orden.Fecha;
-            existingOrden.Cliente = orden.Cliente;
-            existingOrden.Producto = orden.Producto;
-            existingOrden.Motivo = orden.Motivo;
-            existingOrden.NetoS = orden.NetoS;
+            ordenExistente.Neto_S = orden.Neto_S;
+            ordenExistente.Neto_Us = orden.Neto_Us;
+            // Actualiza otros campos necesarios
 
             _context.SaveChanges();
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteOrden(int id)
+        [HttpDelete("{reg}")]
+        public IActionResult DeleteOrden(int reg)
         {
-            var orden = _context.Ordenes.Find(id);
-            if (orden == null) return NotFound();
+            var orden = _context.Ordenes.FirstOrDefault(o => o.Reg == reg);
+            if (orden == null)
+            {
+                return NotFound();
+            }
 
             _context.Ordenes.Remove(orden);
             _context.SaveChanges();

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaFacturacionBackend.Data;
-using SistemaFacturacionBackend.Models;
+using SistemaFacturacionBackend.Models; // Asegúrate de importar este espacio de nombres
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SistemaFacturacionBackend.Controllers
 {

@@ -3,7 +3,8 @@
     public class Vendedor
     {
         public int Codigo { get; set; }
-        public string VendedorNombre { get; set; }
+        public string NombreVendedor { get; set; } 
     }
+
 
 }

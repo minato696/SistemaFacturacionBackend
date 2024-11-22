@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using SistemaFacturacionBackend.Data.Models;
 using SistemaFacturacionBackend.Data;
-using SistemaFacturacionBackend.Data.Models; // Importa el espacio de nombres que contiene tus modelos
 using SistemaFacturacionBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class DetVentaController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -18,15 +19,15 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DetVenta>>> GetDetVentas()
+        public ActionResult<IEnumerable<DetVenta>> GetDetVentas()
         {
-            return await _context.DetVentas.ToListAsync();
+            return _context.DetVentas.ToList();
         }
 
         [HttpGet("{codVta}")]
-        public async Task<ActionResult<DetVenta>> GetDetVenta(string codVta)
+        public ActionResult<DetVenta> GetDetVenta(string codVta)
         {
-            var detVenta = await _context.DetVentas.FindAsync(codVta);
+            var detVenta = _context.DetVentas.FirstOrDefault(dv => dv.COD_VTA == codVta);
             if (detVenta == null)
             {
                 return NotFound();
@@ -35,24 +36,56 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<DetVenta>> PostDetVenta(DetVenta detVenta)
+        public ActionResult<DetVenta> PostDetVenta(DetVenta detVenta)
         {
             _context.DetVentas.Add(detVenta);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetDetVenta), new { codVta = detVenta.CodVta }, detVenta);
+            _context.SaveChanges();
+            return CreatedAtAction(nameof(GetDetVenta), new { codVta = detVenta.COD_VTA }, detVenta);
+        }
+
+        [HttpPut("{codVta}")]
+        public IActionResult PutDetVenta(string codVta, DetVenta detVenta)
+        {
+            if (codVta != detVenta.COD_VTA)
+            {
+                return BadRequest();
+            }
+
+            var detVentaExistente = _context.DetVentas.FirstOrDefault(dv => dv.COD_VTA == codVta);
+            if (detVentaExistente == null)
+            {
+                return NotFound();
+            }
+
+            // Actualizar todos los campos
+            detVentaExistente.ORDEN = detVenta.ORDEN;
+            detVentaExistente.DESCRIPCION = detVenta.DESCRIPCION;
+            detVentaExistente.CIUDAD = detVenta.CIUDAD;
+            detVentaExistente.CANT = detVenta.CANT;
+            detVentaExistente.SEG = detVenta.SEG;
+            detVentaExistente.PUNIT = detVenta.PUNIT;
+            detVentaExistente.IMPORTE = detVenta.IMPORTE;
+            detVentaExistente.PORCENTAJE = detVenta.PORCENTAJE;
+            detVentaExistente.DSCTO = detVenta.DSCTO;
+            detVentaExistente.SECUENCIA = detVenta.SECUENCIA;
+            detVentaExistente.C_ORDEN = detVenta.C_ORDEN;
+            detVentaExistente.RADIO = detVenta.RADIO;
+
+            _context.SaveChanges();
+            return NoContent();
         }
 
         [HttpDelete("{codVta}")]
-        public async Task<IActionResult> DeleteDetVenta(string codVta)
+        public IActionResult DeleteDetVenta(string codVta)
         {
-            var detVenta = await _context.DetVentas.FindAsync(codVta);
+            var detVenta = _context.DetVentas.FirstOrDefault(dv => dv.COD_VTA == codVta);
             if (detVenta == null)
             {
                 return NotFound();
             }
 
             _context.DetVentas.Remove(detVenta);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return NoContent();
         }
     }

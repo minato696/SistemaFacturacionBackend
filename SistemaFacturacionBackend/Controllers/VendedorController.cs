@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Data.Models;
+using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class VendedorController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -17,37 +19,45 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetVendedores()
+        public ActionResult<IEnumerable<Vendedor>> GetVendedores()
         {
-            var vendedores = _context.Vendedores.ToList();
-            return Ok(vendedores);
+            return _context.Vendedores.ToList();
         }
 
         [HttpGet("{codigo}")]
-        public IActionResult GetVendedorByCodigo(int codigo)
+        public ActionResult<Vendedor> GetVendedor(int codigo)
         {
-            var vendedor = _context.Vendedores.Find(codigo);
-            if (vendedor == null) return NotFound();
-            return Ok(vendedor);
+            var vendedor = _context.Vendedores.FirstOrDefault(v => v.Codigo == codigo);
+            if (vendedor == null)
+            {
+                return NotFound();
+            }
+            return vendedor;
         }
 
         [HttpPost]
-        public IActionResult CreateVendedor([FromBody] Vendedor vendedor)
+        public ActionResult<Vendedor> PostVendedor(Vendedor vendedor)
         {
             _context.Vendedores.Add(vendedor);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetVendedorByCodigo), new { codigo = vendedor.Codigo }, vendedor);
+            return CreatedAtAction(nameof(GetVendedor), new { codigo = vendedor.Codigo }, vendedor);
         }
 
         [HttpPut("{codigo}")]
-        public IActionResult UpdateVendedor(int codigo, [FromBody] Vendedor vendedor)
+        public IActionResult PutVendedor(int codigo, Vendedor vendedor)
         {
-            if (codigo != vendedor.Codigo) return BadRequest();
+            if (codigo != vendedor.Codigo)
+            {
+                return BadRequest();
+            }
 
-            var existingVendedor = _context.Vendedores.Find(codigo);
-            if (existingVendedor == null) return NotFound();
+            var vendedorExistente = _context.Vendedores.FirstOrDefault(v => v.Codigo == codigo);
+            if (vendedorExistente == null)
+            {
+                return NotFound();
+            }
 
-            existingVendedor.Nombre = vendedor.Nombre;
+            vendedorExistente.NombreVendedor = vendedor.NombreVendedor;
 
             _context.SaveChanges();
             return NoContent();
@@ -56,8 +66,11 @@ namespace SistemaFacturacionBackend.Controllers
         [HttpDelete("{codigo}")]
         public IActionResult DeleteVendedor(int codigo)
         {
-            var vendedor = _context.Vendedores.Find(codigo);
-            if (vendedor == null) return NotFound();
+            var vendedor = _context.Vendedores.FirstOrDefault(v => v.Codigo == codigo);
+            if (vendedor == null)
+            {
+                return NotFound();
+            }
 
             _context.Vendedores.Remove(vendedor);
             _context.SaveChanges();

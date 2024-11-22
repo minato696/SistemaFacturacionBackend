@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Data.Models;
+using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class VentasController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -17,49 +19,76 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetVentas()
+        public ActionResult<IEnumerable<Venta>> GetVentas()
         {
-            var ventas = _context.Ventas.ToList();
-            return Ok(ventas);
+            return _context.Ventas.ToList();
         }
 
-        [HttpGet("{codigo}")]
-        public IActionResult GetVentaByCodigo(string codigo)
+        [HttpGet("{codVta}")]
+        public ActionResult<Venta> GetVenta(string codVta)
         {
-            var venta = _context.Ventas.FirstOrDefault(v => v.CodVta == codigo);
-            if (venta == null) return NotFound();
-            return Ok(venta);
+            var venta = _context.Ventas.FirstOrDefault(v => v.Cod_Vta == codVta);
+            if (venta == null)
+            {
+                return NotFound();
+            }
+            return venta;
         }
 
         [HttpPost]
-        public IActionResult CreateVenta([FromBody] Venta venta)
+        public ActionResult<Venta> PostVenta(Venta venta)
         {
             _context.Ventas.Add(venta);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetVentaByCodigo), new { codigo = venta.CodVta }, venta);
+            return CreatedAtAction(nameof(GetVenta), new { codVta = venta.Cod_Vta }, venta);
         }
 
-        [HttpPut("{codigo}")]
-        public IActionResult UpdateVenta(string codigo, [FromBody] Venta venta)
+        [HttpPut("{codVta}")]
+        public IActionResult PutVenta(string codVta, Venta venta)
         {
-            if (codigo != venta.CodVta) return BadRequest();
+            if (codVta != venta.Cod_Vta)
+            {
+                return BadRequest();
+            }
 
-            var existingVenta = _context.Ventas.FirstOrDefault(v => v.CodVta == codigo);
-            if (existingVenta == null) return NotFound();
+            var ventaExistente = _context.Ventas.FirstOrDefault(v => v.Cod_Vta == codVta);
+            if (ventaExistente == null)
+            {
+                return NotFound();
+            }
 
-            existingVenta.Cliente = venta.Cliente;
-            existingVenta.Fecha = venta.Fecha;
-            existingVenta.TotalMN = venta.TotalMN;
+            ventaExistente.Ruc = venta.Ruc;
+            ventaExistente.Cliente = venta.Cliente;
+            ventaExistente.Fecha = venta.Fecha;
+            ventaExistente.BrutoMN = venta.BrutoMN;
+            ventaExistente.BaseMN = venta.BaseMN;
+            ventaExistente.IgvMN = venta.IgvMN;
+            ventaExistente.TotalMN = venta.TotalMN;
+            ventaExistente.BrutoME = venta.BrutoME;
+            ventaExistente.BaseME = venta.BaseME;
+            ventaExistente.IgvME = venta.IgvME;
+            ventaExistente.TotalME = venta.TotalME;
+            ventaExistente.Dscto = venta.Dscto;
+            ventaExistente.Orden = venta.Orden;
+            ventaExistente.Orden_Compra = venta.Orden_Compra;
+            ventaExistente.N_Certificacion = venta.N_Certificacion;
+            ventaExistente.Agencia = venta.Agencia;
+            ventaExistente.Moneda = venta.Moneda;
+            ventaExistente.Serie = venta.Serie;
+            ventaExistente.CondPago = venta.CondPago;
 
             _context.SaveChanges();
             return NoContent();
         }
 
-        [HttpDelete("{codigo}")]
-        public IActionResult DeleteVenta(string codigo)
+        [HttpDelete("{codVta}")]
+        public IActionResult DeleteVenta(string codVta)
         {
-            var venta = _context.Ventas.FirstOrDefault(v => v.CodVta == codigo);
-            if (venta == null) return NotFound();
+            var venta = _context.Ventas.FirstOrDefault(v => v.Cod_Vta == codVta);
+            if (venta == null)
+            {
+                return NotFound();
+            }
 
             _context.Ventas.Remove(venta);
             _context.SaveChanges();

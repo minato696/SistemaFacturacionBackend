@@ -1,11 +1,10 @@
-﻿
-namespace SistemaFacturacionBackend.Data.Models
+﻿namespace SistemaFacturacionBackend.Data.Models
 {
     public class Orden
     {
         public int Reg { get; set; }
         public DateTime Fecha { get; set; }
-        public string Orden { get; set; }
+        public string NumeroOrden { get; set; } // Cambiado de "Orden"
         public string Rv { get; set; }
         public string Cliente { get; set; }
         public string Producto { get; set; }
@@ -36,5 +35,4 @@ namespace SistemaFacturacionBackend.Data.Models
         public string Ruc_Cliente { get; set; }
         public string Categoria { get; set; }
     }
-
 }

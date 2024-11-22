@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Data.Models;
+using SistemaFacturacionBackend.Data;
+using SistemaFacturacionBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class VendedorAntController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -16,47 +19,59 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetVendedoresAnt()
+        public ActionResult<IEnumerable<VendedorAnt>> GetVendedoresAnt()
         {
-            var vendedoresAnt = _context.VendedoresAnt.ToList();
-            return Ok(vendedoresAnt);
+            return _context.VendedoresAnt.ToList();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetVendedorAntById(int id)
+        [HttpGet("{codigo}")]
+        public ActionResult<VendedorAnt> GetVendedorAnt(int codigo)
         {
-            var vendedorAnt = _context.VendedoresAnt.Find(id);
-            if (vendedorAnt == null) return NotFound();
-            return Ok(vendedorAnt);
+            var vendedorAnt = _context.VendedoresAnt.FirstOrDefault(v => v.Codigo == codigo);
+            if (vendedorAnt == null)
+            {
+                return NotFound();
+            }
+            return vendedorAnt;
         }
 
         [HttpPost]
-        public IActionResult CreateVendedorAnt([FromBody] VendedorAnt vendedorAnt)
+        public ActionResult<VendedorAnt> PostVendedorAnt(VendedorAnt vendedorAnt)
         {
             _context.VendedoresAnt.Add(vendedorAnt);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetVendedorAntById), new { id = vendedorAnt.Id }, vendedorAnt);
+            return CreatedAtAction(nameof(GetVendedorAnt), new { codigo = vendedorAnt.Codigo }, vendedorAnt);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateVendedorAnt(int id, [FromBody] VendedorAnt vendedorAnt)
+        [HttpPut("{codigo}")]
+        public IActionResult PutVendedorAnt(int codigo, VendedorAnt vendedorAnt)
         {
-            if (id != vendedorAnt.Id) return BadRequest();
+            if (codigo != vendedorAnt.Codigo)
+            {
+                return BadRequest();
+            }
 
-            var existingVendedorAnt = _context.VendedoresAnt.Find(id);
-            if (existingVendedorAnt == null) return NotFound();
+            var vendedorAntExistente = _context.VendedoresAnt.FirstOrDefault(v => v.Codigo == codigo);
+            if (vendedorAntExistente == null)
+            {
+                return NotFound();
+            }
 
-            existingVendedorAnt.Nombre = vendedorAnt.Nombre;
+            vendedorAntExistente.NombreVendedorAnt = vendedorAnt.NombreVendedorAnt; // Ajustado
 
             _context.SaveChanges();
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteVendedorAnt(int id)
+
+        [HttpDelete("{codigo}")]
+        public IActionResult DeleteVendedorAnt(int codigo)
         {
-            var vendedorAnt = _context.VendedoresAnt.Find(id);
-            if (vendedorAnt == null) return NotFound();
+            var vendedorAnt = _context.VendedoresAnt.FirstOrDefault(v => v.Codigo == codigo);
+            if (vendedorAnt == null)
+            {
+                return NotFound();
+            }
 
             _context.VendedoresAnt.Remove(vendedorAnt);
             _context.SaveChanges();

@@ -15,6 +15,7 @@ namespace SistemaFacturacionBackend.Data
         public DbSet<Agenda> Agendas { get; set; }
         public DbSet<Ciudad> Ciudades { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
+
         public DbSet<ClienteMotivo> ClienteMotivos { get; set; }
         public DbSet<Descripcion> Descripciones { get; set; }
         public DbSet<DetVenta> DetVentas { get; set; }

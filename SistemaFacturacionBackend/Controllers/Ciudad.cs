@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Data.Models;
+using SistemaFacturacionBackend.Data;
 using SistemaFacturacionBackend.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SistemaFacturacionBackend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class CiudadController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -17,47 +19,60 @@ namespace SistemaFacturacionBackend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCiudades()
+        public ActionResult<IEnumerable<Ciudad>> GetCiudades()
         {
-            var ciudades = _context.Ciudades.ToList();
-            return Ok(ciudades);
+            return _context.Ciudades.ToList();
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetCiudadById(int id)
+        [HttpGet("{codigo}")]
+        public ActionResult<Ciudad> GetCiudad(string codigo)
         {
-            var ciudad = _context.Ciudades.Find(id);
-            if (ciudad == null) return NotFound();
-            return Ok(ciudad);
+            var ciudad = _context.Ciudades.FirstOrDefault(c => c.Codigo == codigo);
+            if (ciudad == null)
+            {
+                return NotFound();
+            }
+            return ciudad;
         }
 
         [HttpPost]
-        public IActionResult CreateCiudad([FromBody] Ciudad ciudad)
+        public ActionResult<Ciudad> PostCiudad(Ciudad ciudad)
         {
             _context.Ciudades.Add(ciudad);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetCiudadById), new { id = ciudad.Id }, ciudad);
+            return CreatedAtAction(nameof(GetCiudad), new { codigo = ciudad.Codigo }, ciudad);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCiudad(int id, [FromBody] Ciudad ciudad)
+        [HttpPut("{codigo}")]
+        public IActionResult PutCiudad(string codigo, Ciudad ciudad)
         {
-            if (id != ciudad.Id) return BadRequest();
+            if (codigo != ciudad.Codigo)
+            {
+                return BadRequest();
+            }
 
-            var existingCiudad = _context.Ciudades.Find(id);
-            if (existingCiudad == null) return NotFound();
+            var ciudadExistente = _context.Ciudades.FirstOrDefault(c => c.Codigo == codigo);
+            if (ciudadExistente == null)
+            {
+                return NotFound();
+            }
 
-            existingCiudad.Nombre = ciudad.Nombre;
+            ciudadExistente.NombreCiudad = ciudad.NombreCiudad; // Ajustado
+            ciudadExistente.F3 = ciudad.F3;
 
             _context.SaveChanges();
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteCiudad(int id)
+
+        [HttpDelete("{codigo}")]
+        public IActionResult DeleteCiudad(string codigo)
         {
-            var ciudad = _context.Ciudades.Find(id);
-            if (ciudad == null) return NotFound();
+            var ciudad = _context.Ciudades.FirstOrDefault(c => c.Codigo == codigo);
+            if (ciudad == null)
+            {
+                return NotFound();
+            }
 
             _context.Ciudades.Remove(ciudad);
             _context.SaveChanges();
