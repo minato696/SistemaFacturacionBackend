@@ -2,7 +2,8 @@
 {
     public class Vendedor
     {
-        public int Codigo { get; set; } // Este es el identificador primario
-        public string Nombre { get; set; } // Esta propiedad debe estar definida
+        public int Codigo { get; set; }
+        public string VendedorNombre { get; set; }
     }
+
 }

@@ -2,7 +2,8 @@
 {
     public class VendedorAnt
     {
-        public int Id { get; set; } // Clave primaria
-        public string Nombre { get; set; } // Nombre del vendedor antiguo
+        public int Codigo { get; set; }
+        public string VendedorNombre { get; set; }
     }
+
 }

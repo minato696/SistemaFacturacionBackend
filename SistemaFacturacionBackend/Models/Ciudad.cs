@@ -2,7 +2,9 @@
 {
     public class Ciudad
     {
-        public int Id { get; set; } // Clave primaria
-        public string Nombre { get; set; } // Nombre de la ciudad
+        public string Codigo { get; set; }
+        public string Ciudad { get; set; }
+        public string F3 { get; set; }
     }
+
 }

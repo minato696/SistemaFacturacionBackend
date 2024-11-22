@@ -7,4 +7,5 @@
         public string Direccion { get; set; }
         public string Telefono { get; set; }
     }
+
 }
