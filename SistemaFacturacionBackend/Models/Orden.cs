@@ -9,8 +9,6 @@
         public string Cliente { get; set; }
         public string Producto { get; set; }
         public string Motivo { get; set; }
-        public double NetoS { get; set; }
-        public double NetoUs { get; set; }
         public string Agencia { get; set; }
         public string Emisora { get; set; }
         public string Ciudad { get; set; }
@@ -34,5 +32,7 @@
         public string SeFactura { get; set; }
         public string RucCliente { get; set; }
         public string Categoria { get; set; }
+        public double Neto_S { get; set; }
+        public double Neto_Us { get; set; }
     }
 }
