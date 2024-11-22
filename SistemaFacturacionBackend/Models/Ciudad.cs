@@ -1,11 +1,8 @@
-﻿
-namespace SistemaFacturacionBackend.Models
+﻿namespace SistemaFacturacionBackend.Data.Models
 {
     public class Ciudad
     {
-        public string Codigo { get; set; }
-        public string CiudadNombre { get; set; }
-        public string F3 { get; set; }
+        public int Id { get; set; } // Clave primaria
+        public string Nombre { get; set; } // Nombre de la ciudad
     }
-
 }
